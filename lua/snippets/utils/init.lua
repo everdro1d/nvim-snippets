@@ -272,11 +272,6 @@ local function safe_parse(input)
 	return parsed
 end
 
-function utils.preview(snippet)
-	local parse = safe_parse(utils.expand_vars(snippet))
-	return parse and tostring(parse) or snippet
-end
-
 ---@type fun(snippet: string): string
 function utils.expand_vars(input)
 	local lazy_vars = Snippets.utils.builtin_vars.lazy
