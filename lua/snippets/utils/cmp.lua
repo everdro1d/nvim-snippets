@@ -49,6 +49,7 @@ function source:complete(_, callback)
 					insertTextMode = cmp.lsp.InsertTextMode.AdjustIndentation,
 					insertText = body,
 					data = {
+						description = snippet.description,
 						prefix = p,
 						body = body,
 					},
@@ -62,6 +63,7 @@ function source:complete(_, callback)
 				insertTextMode = cmp.lsp.InsertTextMode.AdjustIndentation,
 				insertText = body,
 				data = {
+					description = snippet.description,
 					prefix = prefix,
 					body = body,
 				},
@@ -78,6 +80,10 @@ function source:resolve(completion_item, callback)
 	if config.get_option("highlight_preview", false) then
 		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
 	end
+	if completion_item.data.description then
+		preview = string.format("%s\n---\n%s", completion_item.data.description, preview)
+	end
+
 	completion_item.documentation = {
 		kind = cmp.lsp.MarkupKind.Markdown,
 		value = preview,
