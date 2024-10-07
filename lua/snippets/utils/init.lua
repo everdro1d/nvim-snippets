@@ -6,7 +6,7 @@ utils.builtin_vars = require("snippets.utils.builtin")
 local function read_snippet(snippet, fallback)
 	local snippets = {}
 	local prefix = snippet.prefix or fallback
-	local description = snippet.description or fallback
+	local description = snippet.description
 	local body = snippet.body
 	if type(prefix) == "table" then
 		for _, p in ipairs(prefix) do
