@@ -1,0 +1,96 @@
+local utils = require("snippets.utils")
+
+local function get_snippet_body(snippet)
+	if type(snippet.body) == "table" then
+		return table.concat(snippet.body, "\n")
+	else
+		return snippet.body
+	end
+end
+
+local function snippet_to_complete_items(prefix, snippet)
+	local body = get_snippet_body(snippet)
+	local preview = utils.preview(body)
+	if require("snippets.config").get_option("highlight_preview", false) then
+		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
+	end
+	local description = snippet.description and snippet.description .. "\n\n" or ""
+	local info = string.format("%s%s", description or "", preview)
+
+	return {
+		word = prefix,
+		abbr = prefix .. "~",
+		info = info,
+		kind = "Snippet",
+		user_data = {
+			nvim_snippet = true,
+			prefix = prefix,
+			body = body,
+		},
+		dup = 1,
+		icase = 1,
+	}
+end
+
+local function register()
+	--- Complete function for snippets
+	--- @param findstart number 1 to find start position, 0 to find matches
+	--- @param base string The text to match (empty on first call)
+	--- @return number|table Column position on first call, list of matches on second call
+	_G.nvim_snippets_complete = function(findstart, base)
+		if findstart == 1 then
+			-- First call: find the start of the completion
+			local col = vim.api.nvim_win_get_cursor(0)[2]
+
+			return col
+		else
+			local loaded_snippets = Snippets.load_snippets_for_ft(vim.bo.filetype)
+			if loaded_snippets == nil then
+				return {}
+			end
+
+			local response = {}
+			for key in pairs(loaded_snippets) do
+				local snippet = loaded_snippets[key]
+
+				local prefix = snippet.prefix
+				if type(prefix) == "table" then
+					for _, p in ipairs(prefix) do
+						table.insert(response, snippet_to_complete_items(p, snippet))
+					end
+				else
+					table.insert(response, snippet_to_complete_items(prefix, snippet))
+				end
+			end
+			return response
+		end
+	end
+
+	vim.api.nvim_create_autocmd("CompleteDone", {
+		group = vim.api.nvim_create_augroup("_nvim_snippet_complete", { clear = true }),
+		callback = function()
+			local completed = vim.v.completed_item
+			local word = completed.word
+			local reason = vim.v.event.reason
+
+			if not word or reason ~= "accept" then
+				return
+			end
+
+			if not completed.user_data or not completed.user_data.nvim_snippet then
+				return
+			end
+
+			-- Get current line and cursor position
+			local line = vim.api.nvim_get_current_line()
+			local col = vim.api.nvim_win_get_cursor(0)[2]
+			local start_col = col - word:len()
+
+			line = line:sub(1, start_col)
+			vim.api.nvim_set_current_line(line)
+			vim.snippet.expand(completed.user_data.body)
+		end,
+	})
+end
+
+return { register = register }

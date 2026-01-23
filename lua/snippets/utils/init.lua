@@ -320,6 +320,10 @@ function utils.register_cmp_source()
 	require("snippets.utils.cmp").register()
 end
 
+function utils.register_native_completion()
+	require("snippets.utils.native-completion").register()
+end
+
 function utils.load_friendly_snippets()
 	local search_paths = Snippets.config.get_option("search_paths", {})
 	for _, path in ipairs(vim.api.nvim_list_runtime_paths()) do
