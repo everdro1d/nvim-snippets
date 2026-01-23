@@ -82,12 +82,8 @@ local function register()
 			end
 
 			-- Get current line and cursor position
-			local line = vim.api.nvim_get_current_line()
-			local col = vim.api.nvim_win_get_cursor(0)[2]
-			local start_col = col - word:len()
-
-			line = line:sub(1, start_col)
-			vim.api.nvim_set_current_line(line)
+			local lnum, col = unpack(vim.api.nvim_win_get_cursor(0))
+			vim.api.nvim_buf_set_text(0, lnum - 1, col - #word, lnum - 1, col, {})
 			vim.snippet.expand(completed.user_data.body)
 		end,
 	})
