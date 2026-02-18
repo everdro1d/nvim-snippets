@@ -14,7 +14,14 @@ local function snippet_to_complete_items(prefix, snippet)
 	if require("snippets.config").get_option("highlight_preview", false) then
 		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
 	end
-	local description = snippet.description and snippet.description .. "\n\n" or ""
+	local description = ""
+	if snippet.description then
+		local string_description = snippet.description
+		if type(snippet.description) == "table" then
+			string_description = table.concat(snippet.description, "\n")
+		end
+		description = string_description .. "\n\n"
+	end
 	local info = string.format("%s%s", description or "", preview)
 
 	return {
