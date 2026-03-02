@@ -321,7 +321,9 @@ function utils.register_cmp_source()
 end
 
 function utils.register_native_completion()
-	require("snippets.utils.native-completion").register()
+	require("snippets.utils.native-completion").register(
+		Snippets.config.get_option("native_completion_kind", "Snippet")
+	)
 end
 
 function utils.load_friendly_snippets()

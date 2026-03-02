@@ -8,7 +8,7 @@ local function get_snippet_body(snippet)
 	end
 end
 
-local function snippet_to_complete_items(prefix, snippet)
+local function snippet_to_complete_items(prefix, snippet, kind)
 	local body = get_snippet_body(snippet)
 	local preview = utils.preview(body)
 	if require("snippets.config").get_option("highlight_preview", false) then
@@ -28,7 +28,7 @@ local function snippet_to_complete_items(prefix, snippet)
 		word = prefix,
 		abbr = prefix .. "~",
 		info = info,
-		kind = "Snippet",
+		kind = kind,
 		user_data = {
 			nvim_snippet = true,
 			prefix = prefix,
@@ -39,7 +39,9 @@ local function snippet_to_complete_items(prefix, snippet)
 	}
 end
 
-local function register()
+--- The function to register the global completion function and the autocmd to expand snippets on completion
+--- @param kind string The completion item kind to use for native completion items
+local function register(kind)
 	--- Complete function for snippets
 	--- @param findstart number 1 to find start position, 0 to find matches
 	--- @param base string The text to match (empty on first call)
@@ -63,10 +65,10 @@ local function register()
 				local prefix = snippet.prefix
 				if type(prefix) == "table" then
 					for _, p in ipairs(prefix) do
-						table.insert(response, snippet_to_complete_items(p, snippet))
+						table.insert(response, snippet_to_complete_items(p, snippet, kind))
 					end
 				else
-					table.insert(response, snippet_to_complete_items(prefix, snippet))
+					table.insert(response, snippet_to_complete_items(prefix, snippet, kind))
 				end
 			end
 			return response
