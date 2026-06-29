@@ -15,9 +15,19 @@ local defaults = {
 	--- The created source name is "snippets"
 	---@type boolean
 	create_cmp_source = true,
+	--- Should the global function for native completion be created?
+	--- The created function name is "nvim_snippets_complete"
+	---@type boolean
+	create_native_completion = false,
+	--- The completion item kind to use for native completion items
+	--- @type string
+	native_completion_kind = "Snippet",
 	--- Should we try to load the friendly-snippets snippets?
 	---@type boolean
 	friendly_snippets = false,
+  --- Passed as `FileType` autocommand pattern (`*` if `nil`) to restrict the set of filetypes. Sometimes it can be more convenient than finding what filetype should be separately ignored (think about noice, mini.notify, etc.).
+	---@type string[]?
+	allowed_filetypes = nil,
 	--- A list of filetypes to ignore snippets for
 	---@type table|nil
 	ignored_filetypes = nil,

@@ -66,17 +66,64 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 }
 ```
 
+With minimal `hrsh7th/nvim-cmp` and `garymjr/friendly-snippets` setup:
+
+```lua
+{
+  "hrsh7th/nvim-cmp",
+  dependencies = {
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-path",
+    "hrsh7th/cmp-cmdline",
+    "rafamadriz/friendly-snippets",
+    {
+      "garymjr/nvim-snippets",
+      create_cmp_source = true,
+      friendly_snippets = true,
+    },
+  },
+  config = function()
+    local cmp = require("cmp")
+    cmp.setup({
+      snippet = {
+        expand = function(args)
+          vim.snippet.expand(args.body)
+        end,
+      },
+      mapping = cmp.mapping.preset.insert({
+        -- Recommended keymap.
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+      }),
+      sources = cmp.config.sources({
+        { name = "nvim_lsp"},
+        { name = "snippets" }
+      }, {
+        { name = "buffer" }
+      })
+    })
+  end
+},
+```
+
 ## Configuration
 
-| Option           | Type      | Default                                   | Description           |
--------------------|-----------|-------------------------------------------|------------------------
-create_autocmd     | `boolean?`  | `false`                                     | Optionally load all snippets when opening a file. Only needed if not using [nvim-cmp](https://github.com/hrsh7th/nvim-cmp).
-create_cmp_source  | `boolean?`  | `true`                                      | Optionally create a [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) source. Source name will be `snippets`.
-friendly_snippets  | `boolean?`  | `false`                                     | Set to true if using [friendly-snippets](https://github.com/rafamadriz/friendly-snippets).
-ignored_filetypes  | `string[]?` | `nil`                                       | Filetypes to ignore when loading snippets.
-extended_filetypes | `table?`    | `nil`                                       | Filetypes to load snippets for in addition to the default ones. `ex: {typescript = {'javascript'}}`
-global_snippets    | `string[]?` | `{'all'}`                                   | Snippets to load for all filetypes.
-search_paths       | `string[]`  | `{vim.fn.stdpath('config') .. '/snippets'}` | Paths to search for snippets.
+| Option                  | Type      | Default                                   | Description           |
+--------------------------|-----------|-------------------------------------------|------------------------
+create_autocmd            | `boolean?`  | `false`                                     | Optionally load all snippets when opening a file. Only needed if not using [nvim-cmp](https://github.com/hrsh7th/nvim-cmp).
+create_cmp_source         | `boolean?`  | `true`                                      | Optionally create a [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) source. Source name will be `snippets`.
+create_native_completion  | `boolean?`  | `false`                                     | Optionally create a native completion function for snippets. Function name will be `nvim_snippets_complete`.
+native_completion_kind    | `string?`   | `'Snippet'`                                 | The completion kind to use for the native completion function.
+friendly_snippets         | `boolean?`  | `false`                                     | Set to true if using [friendly-snippets](https://github.com/rafamadriz/friendly-snippets).
+allowed_filetypes         | `string[]?` | `nil`                                       | Passed as `FileType` autocommand pattern (`*` if `nil`) to restrict the set of filetypes. Sometimes it can be more convenient than finding what filetype should be separately ignored (think about noice, mini.notify, etc.).
+ignored_filetypes         | `string[]?` | `nil`                                       | Filetypes to ignore when loading snippets.
+extended_filetypes        | `table?`    | `nil`                                       | Filetypes to load snippets for in addition to the default ones. `ex: {typescript = {'javascript'}}`
+global_snippets           | `string[]?` | `{'all'}`                                   | Snippets to load for all filetypes.
+search_paths              | `string[]`  | `{vim.fn.stdpath('config') .. '/snippets'}` | Paths to search for snippets.
 
 ## Example Snippet
 

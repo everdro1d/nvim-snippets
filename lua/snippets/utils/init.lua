@@ -6,7 +6,7 @@ utils.builtin_vars = require("snippets.utils.builtin")
 local function read_snippet(snippet, fallback)
 	local snippets = {}
 	local prefix = snippet.prefix or fallback
-	local description = snippet.description or fallback
+	local description = snippet.description
 	local body = snippet.body
 	if type(prefix) == "table" then
 		for _, p in ipairs(prefix) do
@@ -272,11 +272,6 @@ local function safe_parse(input)
 	return parsed
 end
 
-function utils.preview(snippet)
-	local parse = safe_parse(utils.expand_vars(snippet))
-	return parse and tostring(parse) or snippet
-end
-
 ---@type fun(snippet: string): string
 function utils.expand_vars(input)
 	local lazy_vars = Snippets.utils.builtin_vars.lazy
@@ -309,7 +304,7 @@ function utils.create_autocmd()
 
 	vim.api.nvim_create_autocmd("FileType", {
 		group = vim.api.nvim_create_augroup("snippets_ft_detect", { clear = true }),
-		pattern = "*",
+    pattern = Snippets.config.get_option("allowed_filetypes") or "*",
 		callback = function()
 			Snippets.load_snippets_for_ft(vim.bo.filetype)
 		end,
@@ -320,11 +315,22 @@ function utils.register_cmp_source()
 	require("snippets.utils.cmp").register()
 end
 
+function utils.register_native_completion()
+	require("snippets.utils.native-completion").register(
+		Snippets.config.get_option("native_completion_kind", "Snippet")
+	)
+end
+
 function utils.load_friendly_snippets()
 	local search_paths = Snippets.config.get_option("search_paths", {})
-	for _, path in ipairs(vim.api.nvim_list_runtime_paths()) do
-		if string.match(path, "friendly.snippets") then
-			table.insert(search_paths, 1, path)
+	local friendly_path = "friendly.snippets/snippets"
+	-- Get all snippet files in the rtp
+	for _, path in ipairs(vim.api.nvim_get_runtime_file("snippets/*.json", true)) do
+		-- Check if it is a friendly-snippets path
+		local pos = string.find(path, friendly_path)
+		if pos then
+			table.insert(search_paths, 1, string.sub(path, 1, pos + #friendly_path - 1))
+			break
 		end
 	end
 	Snippets.config.set_option("search_paths", search_paths)
