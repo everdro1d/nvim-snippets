@@ -10,10 +10,7 @@ end
 
 local function snippet_to_complete_items(prefix, snippet, kind)
 	local body = get_snippet_body(snippet)
-	local preview = utils.preview(body)
-	if require("snippets.config").get_option("highlight_preview", false) then
-		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
-	end
+	local preview = utils.render_preview(body)
 	local description = ""
 	if snippet.description then
 		local string_description = snippet.description

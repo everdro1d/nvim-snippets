@@ -297,6 +297,15 @@ function utils.expand_vars(input)
 	return resolved_snippet
 end
 
+---@type fun(body: string): string
+function utils.render_preview(body)
+	local preview = utils.expand_vars(body)
+	if Snippets.config.get_option("highlight_preview", false) then
+		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
+	end
+	return preview
+end
+
 function utils.create_autocmd()
 	if not Snippets.config.get_option("create_autocmd") then
 		return

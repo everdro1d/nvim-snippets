@@ -76,10 +76,7 @@ end
 function source:resolve(completion_item, callback)
 	completion_item.insertText = utils.expand_vars(completion_item.data.body)
 
-	local preview = completion_item.insertText
-	if config.get_option("highlight_preview", false) then
-		preview = string.format("```%s\n%s\n```", vim.bo.filetype, preview)
-	end
+	local preview = utils.render_preview(completion_item.data.body)
 	if completion_item.data.description then
 		preview = string.format("%s\n---\n%s", completion_item.data.description, preview)
 	end
