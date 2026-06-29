@@ -32,8 +32,13 @@ local function read_file(path)
 	if not file then
 		return nil
 	end
+	
 	local content = file:read("*a")
 	file:close()
+	
+	-- Strip UTF-8 BOM if present
+    content = string.gsub(content, "^\xEF\xBB\xBF", "")
+	
 	return content
 end
 
