@@ -329,7 +329,7 @@ function utils.load_friendly_snippets()
 		-- Check if it is a friendly-snippets path
 		local pos = string.find(path, friendly_path)
 		if pos then
-			table.insert(search_paths, string.sub(path, 1, pos + #friendly_path - 1))
+			table.insert(search_paths, 1, string.sub(path, 1, pos + #friendly_path - 1))
 			break
 		end
 	end
