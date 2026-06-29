@@ -313,7 +313,7 @@ function utils.create_autocmd()
 
 	vim.api.nvim_create_autocmd("FileType", {
 		group = vim.api.nvim_create_augroup("snippets_ft_detect", { clear = true }),
-    pattern = Snippets.config.get_option("allowed_filetypes") or "*",
+        pattern = Snippets.config.get_option("allowed_filetypes") or "*",
 		callback = function()
 			Snippets.load_snippets_for_ft(vim.bo.filetype)
 		end,
@@ -332,16 +332,12 @@ end
 
 function utils.load_friendly_snippets()
 	local search_paths = Snippets.config.get_option("search_paths", {})
-	local friendly_path = "friendly.snippets/snippets"
-	-- Get all snippet files in the rtp
-	for _, path in ipairs(vim.api.nvim_get_runtime_file("snippets/*.json", true)) do
-		-- Check if it is a friendly-snippets path
-		local pos = string.find(path, friendly_path)
-		if pos then
-			table.insert(search_paths, 1, string.sub(path, 1, pos + #friendly_path - 1))
-			break
+	local friendly_path = "friendly-snippets"
+    for _, path in ipairs(vim.api.nvim_get_runtime_file("snippets", true)) do
+		if string.find(path, friendly_path, 1, true) then
+			table.insert(search_paths, 1, path)
 		end
-	end
+    end
 	Snippets.config.set_option("search_paths", search_paths)
 end
 
