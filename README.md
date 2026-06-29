@@ -119,6 +119,7 @@ create_cmp_source         | `boolean?`  | `true`                                
 create_native_completion  | `boolean?`  | `false`                                     | Optionally create a native completion function for snippets. Function name will be `nvim_snippets_complete`.
 native_completion_kind    | `string?`   | `'Snippet'`                                 | The completion kind to use for the native completion function.
 friendly_snippets         | `boolean?`  | `false`                                     | Set to true if using [friendly-snippets](https://github.com/rafamadriz/friendly-snippets).
+allowed_filetypes         | `string[]?` | `nil`                                       | Passed as `FileType` autocommand pattern (`*` if `nil`) to restrict the set of filetypes. Sometimes it can be more convenient than finding what filetype should be separately ignored (think about noice, mini.notify, etc.).
 ignored_filetypes         | `string[]?` | `nil`                                       | Filetypes to ignore when loading snippets.
 extended_filetypes        | `table?`    | `nil`                                       | Filetypes to load snippets for in addition to the default ones. `ex: {typescript = {'javascript'}}`
 global_snippets           | `string[]?` | `{'all'}`                                   | Snippets to load for all filetypes.
