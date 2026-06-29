@@ -68,6 +68,17 @@ local function register(kind)
 					table.insert(response, snippet_to_complete_items(prefix, snippet, kind))
 				end
 			end
+
+            table.sort(response, function(a, b)
+		        local a_match = a.word:lower():find(base:lower(), 1, true) or 999
+		        local b_match = b.word:lower():find(base:lower(), 1, true) or 999
+
+		        if a_match ~= b_match then
+		        	return a_match < b_match -- prefix match
+		        end
+		        return #a.word < #b.word -- prefer shortest
+		    end)
+
 			return response
 		end
 	end
