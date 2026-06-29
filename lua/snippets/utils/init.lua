@@ -6,7 +6,7 @@ utils.builtin_vars = require("snippets.utils.builtin")
 local function read_snippet(snippet, fallback)
 	local snippets = {}
 	local prefix = snippet.prefix or fallback
-	local description = snippet.description or fallback
+	local description = snippet.description
 	local body = snippet.body
 	if type(prefix) == "table" then
 		for _, p in ipairs(prefix) do
@@ -272,11 +272,6 @@ local function safe_parse(input)
 	return parsed
 end
 
-function utils.preview(snippet)
-	local parse = safe_parse(utils.expand_vars(snippet))
-	return parse and tostring(parse) or snippet
-end
-
 ---@type fun(snippet: string): string
 function utils.expand_vars(input)
 	local lazy_vars = Snippets.utils.builtin_vars.lazy
@@ -318,6 +313,12 @@ end
 
 function utils.register_cmp_source()
 	require("snippets.utils.cmp").register()
+end
+
+function utils.register_native_completion()
+	require("snippets.utils.native-completion").register(
+		Snippets.config.get_option("native_completion_kind", "Snippet")
+	)
 end
 
 function utils.load_friendly_snippets()
