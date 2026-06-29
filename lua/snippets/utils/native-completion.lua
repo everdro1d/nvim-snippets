@@ -45,10 +45,10 @@ local function register(kind)
 	--- @return number|table Column position on first call, list of matches on second call
 	_G.nvim_snippets_complete = function(findstart, base)
 		if findstart == 1 then
-			-- First call: find the start of the completion
-			local col = vim.api.nvim_win_get_cursor(0)[2]
-
-			return col
+            -- Find the start of the word matching '\k' (keyword characters)
+		    -- 'b' searches backward, 'n' doesn't move the cursor
+		    local res = vim.fn.searchpos([[\k*\%#]], "bn")
+		    return res[2] - 1
 		else
 			local loaded_snippets = Snippets.load_snippets_for_ft(vim.bo.filetype)
 			if loaded_snippets == nil then
