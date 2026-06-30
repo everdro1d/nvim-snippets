@@ -1,15 +1,18 @@
 # nvim-snippets
 
-Allow vscode style snippets to be used with native neovim snippets `vim.snippet`. Also comes with support for [friendly-snippets](https://github.com/rafamadriz/friendly-snippets).
+A simple snippet engine that allows vscode style snippets to be used with native neovim `vim.snippet`.
+Also comes with support for [friendly-snippets](https://github.com/rafamadriz/friendly-snippets).
 
 ## Features
 
 - Supports vscode style snippets
-- Has builtin support for [friendly-snippets](https://github.com/rafamadriz/friendly-snippets)
 - Uses `vim.snippet` under the hood for snippet expansion
+- Builtin suppert for:
+  - [friendly-snippets](https://github.com/rafamadriz/friendly-snippets)
+  - Native neovim completion (requires 0.12+)
 
 ## Requirements
-- Requires neovim >= 0.10 (with commit [f1775da](https://github.com/neovim/neovim/commit/f1775da07fe48da629468bcfcc2a8a6c4c3f40ed) or later)
+- Requires neovim >= 0.12
 - (optional) [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) for completion support
 - (optional) [friendly-snippets](https://github.com/rafamadriz/friendly-snippets) for pre-built snippets
 
@@ -19,7 +22,66 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 {
-  "garymjr/nvim-snippets",
+    "everdro1d/nvim-snippets",
+    dependencies = { "rafamadriz/friendly-snippets" }, -- optionally add friendly-snippets
+},
+
+```
+
+Native Completion Example.
+
+```lua
+require('snippets').setup({
+    create_cmp_source = false,
+
+    create_autocmd = true,
+    create_native_completion = true,
+    native_completion_kind = 'Snippet',
+
+    friendly_snippets = true,
+
+    -- Use package.json file OR name child directories after filetypes
+    -- (original author) https://www.reddit.com/r/neovim/comments/188js80/comment/kbn9f3b/
+    search_paths = {
+        vim.fn.stdpath('config') .. '/snippets'
+    },
+})
+
+-- add native snippet completion
+vim.opt.completefunc = "v:lua.nvim_snippets_complete"
+```
+
+Keybinds Config Example
+
+```lua
+-- next snippet part or show completion if not in snippet
+vim.keymap.set({ "i", "s" }, "<C-l>", function()
+    if vim.snippet.active({ direction = 1 }) then
+        vim.schedule(function()
+            vim.snippet.jump(1)
+        end)
+    end
+    -- Open completion menu
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-x><C-u>", true, true, true), "i", false)
+end, { silent = true, desc = "jump to next snippet part or open completion" })
+
+-- go to previous snippet part
+vim.keymap.set({ "i", "s" }, "<C-h>", function()
+    if vim.snippet.active({ direction = -1 }) then
+        vim.schedule(function()
+            vim.snippet.jump(-1)
+        end)
+    end
+end, { silent = true, desc = "go back a snippet part" })
+
+```
+
+<detail>
+<summary>Legacy Config Example</summary>
+
+```lua
+{
+  "everdro1d/nvim-snippets",
   keys = {
     {
       "<Tab>",
@@ -66,7 +128,10 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 }
 ```
 
-With minimal `hrsh7th/nvim-cmp` and `garymjr/friendly-snippets` setup:
+</detail>
+
+<detail>
+<summary>With minimal <code>hrsh7th/nvim-cmp</code> and <code>rafamadriz/friendly-snippets</code> setup:</summary>
 
 ```lua
 {
@@ -78,7 +143,7 @@ With minimal `hrsh7th/nvim-cmp` and `garymjr/friendly-snippets` setup:
     "hrsh7th/cmp-cmdline",
     "rafamadriz/friendly-snippets",
     {
-      "garymjr/nvim-snippets",
+      "everdro1d/nvim-snippets",
       create_cmp_source = true,
       friendly_snippets = true,
     },
@@ -110,10 +175,12 @@ With minimal `hrsh7th/nvim-cmp` and `garymjr/friendly-snippets` setup:
 },
 ```
 
-## Configuration
+</detail>
 
-| Option                  | Type      | Default                                   | Description           |
---------------------------|-----------|-------------------------------------------|------------------------
+## Configuration Options
+
+| Option                  | Type        | Default                                     | Description           |
+--------------------------|-------------|---------------------------------------------|------------------------
 create_autocmd            | `boolean?`  | `false`                                     | Optionally load all snippets when opening a file. Only needed if not using [nvim-cmp](https://github.com/hrsh7th/nvim-cmp).
 create_cmp_source         | `boolean?`  | `true`                                      | Optionally create a [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) source. Source name will be `snippets`.
 create_native_completion  | `boolean?`  | `false`                                     | Optionally create a native completion function for snippets. Function name will be `nvim_snippets_complete`.
@@ -135,7 +202,3 @@ search_paths              | `string[]`  | `{vim.fn.stdpath('config') .. '/snippe
   }
 }
 ```
-
-## TODO
-- [ ] Automatically detect if friendly-snippets is installed
-- [X] Add support for friendly-snippets `package.json` definitions (#31)
